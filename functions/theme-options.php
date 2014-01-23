@@ -813,7 +813,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-accent',
 			'label'		=> 'Primary Accent Color',
-			'desc'		=> '<i>Default: #e8554e</i>',
 			'std'		=> '#e8554e',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -822,7 +821,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-topbar',
 			'label'		=> 'Topbar Background',
-			'desc'		=> '<i>Default: #222222</i>',
 			'std'		=> '#222222',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -831,7 +829,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-header',
 			'label'		=> 'Header Background',
-			'desc'		=> '<i>Default: #f2f2f2</i>',
 			'std'		=> '#f2f2f2',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -855,7 +852,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-footer',
 			'label'		=> 'Footer Background',
-			'desc'		=> '<i>Default: #222222</i>',
 			'std'		=> '#222222',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -864,7 +860,7 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-footer-toplink',
 			'label'		=> 'Footer Toplink Color',
-			'desc'		=> 'Suggestion - use the same color as your primary accent color<br /><i>Default: #333333</i>',
+			'desc'		=> 'Suggestion - use the same color as your primary accent color',
 			'std'		=> '#333333',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -883,7 +879,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-audio',
 				'label'		=> 'Format: Audio',
-				'desc'		=> '<i>Default: #69bac8</i>',
 				'std'		=> '#69bac8',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -891,7 +886,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-chat',
 				'label'		=> 'Format: Chat',
-				'desc'		=> '<i>Default: #69bac8</i>',
 				'std'		=> '#69bac8',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -899,7 +893,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-gallery',
 				'label'		=> 'Format: Gallery',
-				'desc'		=> '<i>Default: #7eb66f</i>',
 				'std'		=> '#7eb66f',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -907,7 +900,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-image',
 				'label'		=> 'Format: Image',
-				'desc'		=> '<i>Default: #7eb66f</i>',
 				'std'		=> '#7eb66f',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -915,7 +907,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-link',
 				'label'		=> 'Format: Link',
-				'desc'		=> '<i>Default: #e8554e</i>',
 				'std'		=> '#e8554e',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -923,7 +914,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-quote',
 				'label'		=> 'Format: Quote',
-				'desc'		=> '<i>Default: #e7ba3a</i>',
 				'std'		=> '#e7ba3a',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -931,7 +921,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-status',
 				'label'		=> 'Format: Status',
-				'desc'		=> '<i>Default: #ffa500</i>',
 				'std'		=> '#ffa500',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -939,7 +928,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-video',
 				'label'		=> 'Format: Video',
-				'desc'		=> '<i>Default: #e8554e</i>',
 				'std'		=> '#e8554e',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
