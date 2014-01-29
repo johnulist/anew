@@ -19,7 +19,7 @@
 			
 			<div class="post-inner">
 				
-				<?php get_template_part('inc/post-formats'); ?>
+				<?php if( get_post_format() ) { get_template_part('inc/post-formats'); } ?>
 				
 				<div class="post-deco">
 					<div class="hex hex-small">
