@@ -29,6 +29,7 @@ function custom_theme_options() {
 				<li>Read the theme documentation <a target="_blank" href="'.get_template_directory_uri().'/functions/documentation/documentation.html">here</a></li>
 				<li>Download the sample child theme <a href="https://github.com/AlxMedia/anew-child/archive/master.zip">here</a></li>
 				<li>Download or contribute translations <a target="_blank" href="https://github.com/AlxMedia/anew-languages">here</a></li>
+				<li>Anew is on <a target="_blank" href="https://github.com/AlxMedia/anew">GitHub</a></li>
 			</ul>
 			<hr />
 			<p>You can support the theme author by donating <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C5J7JHMSHW9T8">here</a> – any amount is always appreciated.</p>
@@ -659,7 +660,7 @@ function custom_theme_options() {
 			'type'		=> 'on-off',
 			'section'	=> 'styling'
 		),
-		// General: Boxed Layout
+		// Styling: Boxed Layout
 		array(
 			'id'		=> 'boxed',
 			'label'		=> 'Boxed Layout',
