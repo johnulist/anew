@@ -40,7 +40,7 @@
 			<?php if ( ot_get_option('header-image') == '' ): ?>
 			<div class="pad group">
 				<?php echo alx_site_title(); ?>
-				<?php if ( !ot_get_option('site-description') ): ?><p class="site-description"><?php bloginfo( 'description' ); ?></p><?php endif; ?>
+				<?php if ( ot_get_option('site-description') != 'off' ): ?><p class="site-description"><?php bloginfo( 'description' ); ?></p><?php endif; ?>
 				<?php alx_social_links() ; ?>
 			</div>
 			<?php endif; ?>

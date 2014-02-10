@@ -1,6 +1,13 @@
   Theme : Anew
-Version : 2.1.0
+Version : 2.1.1
  Author : Alexander "Alx" Agnarson - http://alxmedia.se
+
+February 10 2014 - 2.1.1
+===========================================================
+- Updated to OptionTree 2.3.0
+- Changed checkbox options to the new on-off toggle
+- Added additional Google fonts
+- Updated help dropdown information and included theme documentation with the theme
 
 January 29 2014 - 2.1.0
 ===========================================================

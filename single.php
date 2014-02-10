@@ -40,14 +40,14 @@
 					<?php the_tags('<p class="post-tags"><span>'.__('Tags:','anew').'</span> ','','</p>'); ?>
 					
 				</div><!--/.post-content-->
-				<?php if ( !ot_get_option('sharrre') ) { get_template_part('inc/sharrre'); } ?>
+				<?php if ( ot_get_option('sharrre') != 'off' ) { get_template_part('inc/sharrre'); } ?>
 				
 			</div><!--/.post-inner-->
 			
 		</article><!--/.post-->			
 	<?php endwhile; ?>
 		
-	<?php if ( !ot_get_option( 'author-bio' ) && get_the_author_meta( 'description' ) ): // authorbio ?>
+	<?php if ( ( ot_get_option( 'author-bio' ) != 'off' ) && get_the_author_meta( 'description' ) ): ?>
 		<div class="author-bio">
 			<div class="bio-avatar"><?php echo get_avatar(get_the_author_meta('user_email'),'128'); ?></div>
 			<p class="bio-name"><?php the_author_posts_link(); ?></p>
@@ -56,9 +56,7 @@
 		</div>
 	<?php endif; ?>
 	
-	<?php if ( ot_get_option( 'post-nav' ) == 'content') { get_template_part('inc/post-nav'); } ?>
-	
-	<?php if ( ot_get_option( 'related-posts' ) != '1' ) { get_template_part('inc/related-posts'); } ?>
+	<?php if ( ot_get_option( 'post-nav' ) != 'off') { get_template_part('inc/post-nav'); } ?>
 	
 	<?php comments_template('/comments.php',true); ?>
 	
