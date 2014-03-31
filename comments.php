@@ -7,8 +7,8 @@
 		<h3 class="heading"><?php comments_number( __( 'No Responses', 'anew' ), __( '1 Response', 'anew' ), __( '% Responses', 'anew' ) ); ?></h3>
 	
 		<ul class="comment-tabs group">
-			<li class="active"><a href="#commentlist-container"><i class="fa fa-comments"></i><?php echo count($wp_query->comments_by_type['comment']); ?> <?php _e( 'Comments', 'anew' ); ?></a></li>
-			<li><a href="#pinglist-container"><i class="fa fa-share"></i><?php echo count($wp_query->comments_by_type['pings']); ?> <?php _e( 'Track/Pingbacks', 'anew' ); ?></a></li>
+			<li class="active"><a href="#commentlist-container"><i class="fa fa-comments-o"></i><?php _e( 'Comments', 'anew' ); ?><span><?php echo count($wp_query->comments_by_type['comment']); ?></span></a></li>
+			<li><a href="#pinglist-container"><i class="fa fa-share"></i><?php _e( 'Pingbacks', 'anew' ); ?><span><?php echo count($wp_query->comments_by_type['pings']); ?></span></a></li>
 		</ul>
 
 		<?php if ( ! empty( $comments_by_type['comment'] ) ) { ?>

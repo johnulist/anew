@@ -126,7 +126,8 @@ a,
 .post-tags a:hover,
 .author-bio .bio-avatar:after,
 .widget_calendar caption,
-.commentlist li.bypostauthor > .comment-body:after { background-color: '.ot_get_option('color-accent').'; }
+.commentlist li.bypostauthor > .comment-body:after,
+.commentlist li.comment-author-admin > .comment-body:after { background-color: '.ot_get_option('color-accent').'; }
 
 .alx-tabs-nav li.active a,
 .wp-pagenavi a:hover,
