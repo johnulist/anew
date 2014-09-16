@@ -30,13 +30,13 @@ $page_options = array(
 			'label'		=> 'Primary Sidebar',
 			'id'		=> '_sidebar_primary',
 			'type'		=> 'sidebar-select',
-			'desc'		=> 'Overrides default'
+			'desc'		=> ''
 		),
 		array(
 			'label'		=> 'Layout',
 			'id'		=> '_layout',
 			'type'		=> 'radio-image',
-			'desc'		=> 'Overrides the default layout option',
+			'desc'		=> '',
 			'std'		=> 'inherit',
 			'choices'	=> array(
 				array(
