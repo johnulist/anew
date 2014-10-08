@@ -499,11 +499,11 @@ add_filter( 'embed_oembed_html', 'alx_embed_wmode_transparent', 10, 3 );
 
 
 /*  Add responsive container to embeds
-/* ------------------------------------ */
+/* ------------------------------------ */	
 if ( ! function_exists( 'alx_embed_html' ) ) {
 
 	function alx_embed_html( $html, $url ) {
-	
+		
 		$pattern    = '/^https?:\/\/(www\.)?twitter\.com/';
 		$is_twitter = preg_match( $pattern, $url );
 		
@@ -516,7 +516,18 @@ if ( ! function_exists( 'alx_embed_html' ) ) {
 
 }
 add_filter( 'embed_oembed_html', 'alx_embed_html', 10, 3 );
-add_filter( 'video_embed_html', 'alx_embed_html' ); // Jet pack
+
+
+/*  Add responsive container to jetpack embeds
+/* ------------------------------------ */	
+if ( ! function_exists( 'alx_embed_html_jp' ) ) {
+
+	function alx_embed_html_jp( $html ) {
+		return '<div class="video-container">' . $html . '</div>';
+	}
+
+}
+add_filter( 'video_embed_html', 'alx_embed_html_jp' );
 
 
 /*  Upscale cropped thumbnails
