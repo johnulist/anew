@@ -389,30 +389,6 @@ if ( ! function_exists( 'alx_body_class' ) ) {
 add_filter( 'body_class', 'alx_body_class' );
 
 
-/*  Site title
-/* ------------------------------------ */
-if ( ! function_exists( 'alx_wp_title' ) ) {
-
-	function alx_wp_title( $title ) {
-		// Do not filter for RSS feed / if SEO plugin installed
-		if ( is_feed() || class_exists('All_in_One_SEO_Pack') || class_exists('HeadSpace_Plugin') || class_exists('Platinum_SEO_Pack') || class_exists('wpSEO') || defined('WPSEO_VERSION') )
-			return $title;
-		if ( is_front_page() ) { 
-			$title = get_bloginfo('name').' - '.get_bloginfo('description');
-		}
-		if ( is_front_page() && get_bloginfo('description') == '' ) { 
-			$title = get_bloginfo('name');
-		}
-		if ( !is_front_page() ) { 
-			$title .= ' - '.get_bloginfo('name');
-		}
-		return $title;
-	}
-	
-}
-add_filter( 'wp_title', 'alx_wp_title' );
-
-
 /*  Custom rss feed
 /* ------------------------------------ */
 if ( ! function_exists( 'alx_feed_link' ) ) {
