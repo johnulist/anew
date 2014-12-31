@@ -4,6 +4,7 @@ Version : 2.2.0
 
 December 31 2014 - 2.2.0
 ===========================================================
+- Added WP 4.1 title tag support
 - Updated to OptionTree 2.4.6
 
 October 10 2014 - 2.1.9
