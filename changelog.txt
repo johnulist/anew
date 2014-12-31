@@ -1,6 +1,10 @@
   Theme : Anew
-Version : 2.1.9
+Version : 2.2.0
  Author : Alexander "Alx" Agnarson - http://alxmedia.se
+
+December 31 2014 - 2.2.0
+===========================================================
+- Updated to OptionTree 2.4.6
 
 October 10 2014 - 2.1.9
 ===========================================================
