@@ -556,6 +556,8 @@ transform: rotate(60deg) translate(-48px, -11px); }
 	-o-transition: height 0.35s ease;
 	transition: height 0.35s ease; }
 	.expand .nav-wrap { height: auto; }
+	/* iphone fix */
+	.safari .nav-wrap.transition { -webkit-transition: none; transition: none; }
 	/* common */
 	.nav { float: left; width: 100%; }
 	.nav li a { line-height: 20px; display: block; padding: 8px 20px; }
