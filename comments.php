@@ -7,8 +7,8 @@
 		<h3 class="heading"><?php comments_number( __( 'No Responses', 'anew' ), __( '1 Response', 'anew' ), __( '% Responses', 'anew' ) ); ?></h3>
 	
 		<ul class="comment-tabs group">
-			<li class="active"><a href="#commentlist-container"><i class="fa fa-comments"></i><?php echo count($wp_query->comments_by_type['comment']); ?> <?php _e( 'Comments', 'anew' ); ?></a></li>
-			<li><a href="#pinglist-container"><i class="fa fa-share"></i><?php echo count($wp_query->comments_by_type['pings']); ?> <?php _e( 'Track/Pingbacks', 'anew' ); ?></a></li>
+			<li class="active"><a href="#commentlist-container"><i class="fa fa-comments-o"></i><?php _e( 'Comments', 'anew' ); ?><span><?php echo count($wp_query->comments_by_type['comment']); ?></span></a></li>
+			<li><a href="#pinglist-container"><i class="fa fa-share"></i><?php _e( 'Pingbacks', 'anew' ); ?><span><?php echo count($wp_query->comments_by_type['pings']); ?></span></a></li>
 		</ul>
 
 		<?php if ( ! empty( $comments_by_type['comment'] ) ) { ?>
@@ -29,16 +29,16 @@
 		<?php } ?>
 		
 		<?php if ( ! empty( $comments_by_type['pings'] ) ) { ?>
-		<div id="pinglist-container" class="comment-tab" style="display: none;">
+		<div id="pinglist-container" class="comment-tab">
 			
 			<ol class="pinglist">
 				<?php // not calling wp_list_comments twice, as it breaks pagination
 				$pings = $comments_by_type['pings'];
-				foreach ($pings as $ping) { ?>
+				foreach ($pings as $comment) { ?>
 					<li class="ping">
-						<div class="ping-link"><?php comment_author_link($ping); ?></div>
-						<div class="ping-meta"><?php comment_date( get_option( 'date_format' ), $ping ); ?></div>
-						<div class="ping-content"><?php comment_text($ping); ?></div>
+						<div class="ping-link"><?php comment_author_link($comment); ?></div>
+						<div class="ping-meta"><?php comment_date( get_option( 'date_format' ), $comment ); ?></div>
+						<div class="ping-content"><?php comment_text($comment); ?></div>
 					</li>
 				<?php } ?>
 			</ol><!--/.pinglist-->

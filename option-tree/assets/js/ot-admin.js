@@ -14,7 +14,7 @@
       this.init_add();
       this.init_edit();
       this.init_remove();
-      this.init_edit_title()
+      this.init_edit_title();
       this.init_edit_id();
       this.init_activate_layout();
       this.init_conditions();
@@ -24,10 +24,14 @@
       this.init_tabs();
       this.init_radio_image_select();
       this.init_select_wrapper();
+      this.bind_select_wrapper();
+      this.init_google_fonts();
       this.fix_upload_parent();
       this.fix_textarea();
       this.replicate_ajax();
       this.reset_settings();
+      this.css_editor_mode();
+      this.javascript_editor_mode();
     },
     init_hide_body: function(elm,type) {
       var css = '.option-tree-setting-body';
@@ -55,8 +59,9 @@
         $(css).removeClass('active');
       }
     },
-    init_sortable: function() {
-      $('.option-tree-sortable').each( function() {
+    init_sortable: function(scope) {
+      scope = scope || document;
+      $('.option-tree-sortable', scope).each( function() {
         if ( $(this).children('li').length ) {
           var elm = $(this);
           elm.show();
@@ -99,6 +104,10 @@
       $(document).on('click', '.option-tree-list-item-add', function(e) {
         e.preventDefault();
         OT_UI.add(this,'list_item');
+      });
+      $(document).on('click', '.option-tree-social-links-add', function(e) {
+        e.preventDefault();
+        OT_UI.add(this,'social_links');
       });
       $(document).on('click', '.option-tree-list-item-setting-add', function(e) {
         e.preventDefault();
@@ -145,6 +154,13 @@
       $(document).on('keyup', '.option-tree-setting-title', function() {
         OT_UI.edit_title(this);
       });
+      // Automatically fill option IDs with clean versions of their respective option labels
+      $(document).on('blur', '.option-tree-setting-title', function() {
+        var optionId = $(this).parents('.option-tree-setting-body').find('[type="text"][name$="id]"]')
+        if ( optionId.val() === '' ) {
+          optionId.val($(this).val().replace(/[^a-z0-9]/gi,'_').toLowerCase());
+        }
+      });
     },
     init_edit_id: function() {
       $(document).on('keyup', '.section-id', function(){
@@ -189,6 +205,9 @@
       } else if ( type == 'list_item_setting' ) {
         list = $(elm).parent().children('ul');
         list_class = 'list-sub-setting';
+      } else if ( type == 'social_links' ) {
+        list = $(elm).parent().children('ul');
+        list_class = 'list-sub-setting';
       } else {
         list = $(elm).parent().find('ul:first');
         list_class = ( type == 'section' ) ? 'list-section' : 'list-setting';
@@ -200,7 +219,7 @@
       if ( this.processing === false ) {
         this.processing = true;
         var count = parseInt(list.children('li').length);
-        if ( type == 'list_item' ) {
+        if ( type == 'list_item' || type == 'social_links' ) {
           list.find('li input.option-tree-setting-title', self).each(function(){
             var setting = $(this).attr('name'),
                 regex = /\[([0-9]+)\]/,
@@ -232,18 +251,18 @@
               OT_UI.init_remove_active();
               OT_UI.init_hide_body();
             }
-            list.append('<li class="ui-state-default ' + list_class + '">' + data.responseText + '</li>');
+            var listItem = $('<li class="ui-state-default ' + list_class + '">' + data.responseText + '</li>');
+            list.append(listItem);
             list.children().last().find('.option-tree-setting-edit').toggleClass('active');
             list.children().last().find('.option-tree-setting-body').toggle();
             list.children().last().find('.option-tree-setting-title').focus();
             if ( type != 'the_contextual_help' ) {
               OT_UI.update_ids(list);
             }
-            setTimeout( function() {
-              OT_UI.init_sortable();
-              OT_UI.init_select_wrapper();
-              OT_UI.init_numeric_slider();
-            }, 500);
+            OT_UI.init_sortable(listItem);
+            OT_UI.init_select_wrapper(listItem);
+            OT_UI.init_numeric_slider(listItem);
+            OT_UI.parse_condition();
             self.processing = false;
           }
         });
@@ -288,16 +307,19 @@
         last_section = section;
       });
     },
+    condition_objects: function() {
+      return 'select, input[type="radio"]:checked, input[type="text"], input[type="hidden"], input.ot-numeric-slider-hidden-input';
+    },
     match_conditions: function(condition) {
       var match;
-      var regex = /(.+?):(is|not|contains|less_than|less_than_or_equal_to|greater_than|greater_than_or_equal_to)\((.+?)\),?/g;
+      var regex = /(.+?):(is|not|contains|less_than|less_than_or_equal_to|greater_than|greater_than_or_equal_to)\((.*?)\),?/g;
       var conditions = [];
 
       while( match = regex.exec( condition ) ) {
         conditions.push({
           'check': match[1], 
           'rule':  match[2], 
-          'value': match[3]
+          'value': match[3] || ''
         });
       }
 
@@ -308,36 +330,36 @@
 
         var passed;
         var conditions = OT_UI.match_conditions( $( this ).data( 'condition' ) );
-        var operator  = ( $( this ).data( 'operator' ) || 'and' ).toLowerCase();
+        var operator = ( $( this ).data( 'operator' ) || 'and' ).toLowerCase();
 
         $.each( conditions, function( index, condition ) {
 
           var target   = $( '#setting_' + condition.check );
-          var targetEl = !! target.length && target.find( 'select, input[type="radio"]:checked, input.ot-numeric-slider-hidden-input' ).first();
+          var targetEl = !! target.length && target.find( OT_UI.condition_objects() ).first();
 
-          if( ! target.length || ! targetEl.length ) {
+          if ( ! target.length || ( ! targetEl.length && condition.value.toString() != '' ) ) {
             return;
           }
 
-          var v1 = targetEl.val().toString();
+          var v1 = targetEl.length ? targetEl.val().toString() : '';
           var v2 = condition.value.toString();
           var result;
 
-          switch( condition.rule ) {
+          switch ( condition.rule ) {
             case 'less_than':
-              result = ( v1 < v2 );
+              result = ( parseInt( v1 ) < parseInt( v2 ) );
               break;
             case 'less_than_or_equal_to':
-              result = ( v1 <= v2 );
+              result = ( parseInt( v1 ) <= parseInt( v2 ) );
               break;
             case 'greater_than':
-              result = ( v1 > v2 );
+              result = ( parseInt( v1 ) > parseInt( v2 ) );
               break;
             case 'greater_than_or_equal_to':
-              result = ( v1 >= v2 );
+              result = ( parseInt( v1 ) >= parseInt( v2 ) );
               break;
             case 'contains':
-              result = ( v2.indexOf(v1) !== -1 ? true : false );
+              result = ( v1.indexOf(v2) !== -1 ? true : false );
               break; 
             case 'is':
               result = ( v1 == v2 );
@@ -347,11 +369,11 @@
               break;
           }
 
-          if( 'undefined' == typeof passed ) {
+          if ( 'undefined' == typeof passed ) {
             passed = result;
           }
 
-          switch( operator ) {
+          switch ( operator ) {
             case 'or':
               passed = ( passed || result );
               break;
@@ -374,16 +396,32 @@
       });
     },
     init_conditions: function() {
-      $( document ).on( 'change.conditionals', '.format-settings[id^="setting_"] select, .format-settings[id^="setting_"] input[type="radio"]:checked, .format-settings[id^="setting_"] input.ot-numeric-slider-hidden-input', function( e ) {
-        OT_UI.parse_condition();
+      var delay = (function() {
+        var timer = 0;
+        return function(callback, ms) {
+          clearTimeout(timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $('.format-settings[id^="setting_"]').on( 'change.conditionals, keyup.conditionals', OT_UI.condition_objects(), function(e) {
+        if (e.type === 'keyup') {
+          // handle keyup event only once every 500ms
+          delay(function() {
+            OT_UI.parse_condition();
+          }, 500);
+        } else {
+          OT_UI.parse_condition();
+        }
       });
-      $(OT_UI.parse_condition());
+      OT_UI.parse_condition();
     },
     init_upload: function() {
       $(document).on('click', '.ot_upload_media', function() {
-        var field_id    = $(this).parent('.option-tree-ui-upload-parent').find('input').attr('id'),
-            post_id     = $(this).attr('rel'),
-            btnContent  = '';
+        var field_id            = $(this).parent('.option-tree-ui-upload-parent').find('input').attr('id'),
+            post_id             = $(this).attr('rel'),
+            save_attachment_id  = $('#'+field_id).hasClass('ot-upload-attachment-id'),
+            btnContent          = '';
         if ( window.wp && wp.media ) {
           window.ot_media_frame = window.ot_media_frame || new wp.media.view.MediaFrame.Select({
             title: $(this).attr('title'),
@@ -394,14 +432,15 @@
           });
           window.ot_media_frame.on('select', function() {
             var attachment = window.ot_media_frame.state().get('selection').first(), 
-                href = attachment.attributes.url, 
+                href = attachment.attributes.url,
+                attachment_id = attachment.attributes.id,
                 mime = attachment.attributes.mime,
                 regex = /^image\/(?:jpe?g|png|gif|x-icon)$/i;
             if ( mime.match(regex) ) {
               btnContent += '<div class="option-tree-ui-image-wrap"><img src="'+href+'" alt="" /></div>';
             }
-            btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button red light" title="'+option_tree.remove_media_text+'"><span class="icon trash-can">'+option_tree.remove_media_text+'</span></a>';
-            $('#'+field_id).val(href);
+            btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button button button-secondary light" title="'+option_tree.remove_media_text+'"><span class="icon ot-icon-minus-circle"></span>'+option_tree.remove_media_text+'</a>';
+            $('#'+field_id).val( ( save_attachment_id ? attachment_id : href ) );
             $('#'+field_id+'_media').remove();
             $('#'+field_id).parent().parent('div').append('<div class="option-tree-ui-media-wrap" id="'+field_id+'_media" />');
             $('#'+field_id+'_media').append(btnContent).slideDown();
@@ -429,7 +468,7 @@
             if (href.match(image) && OT_UI.url_exists(href)) {
               btnContent += '<div class="option-tree-ui-image-wrap"><img src="'+href+'" alt="" /></div>';
             }
-            btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button red light" title="'+option_tree.remove_media_text+'"><span class="icon trash-can">'+option_tree.remove_media_text+'</span></a>';
+            btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button button button-secondary light" title="'+option_tree.remove_media_text+'"><span class="icon ot-icon-minus-circle"></span>'+option_tree.remove_media_text+'</a>';
             $('#'+field_id).val(href);
             $('#'+field_id+'_media').remove();
             $('#'+field_id).parent().parent('div').append('<div class="option-tree-ui-media-wrap" id="'+field_id+'_media" />');
@@ -457,9 +496,12 @@
     init_upload_fix: function(elm) {
       var id  = $(elm).attr('id'),
           val = $(elm).val(),
-          img = $(elm).parent().next('option-tree-ui-media-wrap').find('img'),
+          img = $(elm).parent().next('.option-tree-ui-media-wrap').find('img'),
           src = img.attr('src'),
           btnContent = '';
+      if ( val == src ) {
+        return;
+      }
       if ( val != src ) {
         img.attr('src', val);
       }
@@ -468,7 +510,7 @@
         if (val.match(image)) {
           btnContent += '<div class="option-tree-ui-image-wrap"><img src="'+val+'" alt="" /></div>';
         }
-        btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button red light" title="'+option_tree.remove_media_text+'"><span class="icon trash-can">'+option_tree.remove_media_text+'</span></a>';
+        btnContent += '<a href="javascript:(void);" class="option-tree-ui-remove-media option-tree-ui-button button button-secondary light" title="'+option_tree.remove_media_text+'"><span class="icon ot-icon-minus-circle">'+option_tree.remove_media_text+'</span></a>';
         $('#'+id).val(val);
         $('#'+id+'_media').remove();
         $('#'+id).parent().parent('div').append('<div class="option-tree-ui-media-wrap" id="'+id+'_media" />');
@@ -477,8 +519,9 @@
         $(elm).parent().next('.option-tree-ui-media-wrap').remove();
       }
     },
-    init_numeric_slider: function() {
-      $(".ot-numeric-slider-wrap").each(function() {
+    init_numeric_slider: function(scope) {
+      scope = scope || document;
+      $(".ot-numeric-slider-wrap", scope).each(function() {
         var hidden = $(".ot-numeric-slider-hidden-input", this),
             value  = hidden.val(),
             helper = $(".ot-numeric-slider-helper-input", this);
@@ -492,10 +535,13 @@
           step: hidden.data("step"),
           value: value, 
           slide: function(event, ui) {
-            hidden.add(helper).val(ui.value);
+            hidden.add(helper).val(ui.value).trigger('change');
+          },
+          create: function() {
+            hidden.val($(this).slider('value'));
           },
           change: function() {
-            $(OT_UI.init_conditions());
+            OT_UI.parse_condition();
           }
         });
       });
@@ -530,25 +576,114 @@
         $(this).parent().find('.option-tree-ui-radio').prop('checked', true).trigger('change');
       });
     },
-    init_select_wrapper: function() {
-      $('.option-tree-ui-select').each(function () {
+    init_select_wrapper: function(scope) {
+      scope = scope || document;
+      $('.option-tree-ui-select', scope).each(function () {
         if ( ! $(this).parent().hasClass('select-wrapper') ) {
           $(this).wrap('<div class="select-wrapper" />');
           $(this).parent('.select-wrapper').prepend('<span>' + $(this).find('option:selected').text() + '</span>');
         }
       });
+    },
+    bind_select_wrapper: function() {
       $(document).on('change', '.option-tree-ui-select', function () {
         $(this).prev('span').replaceWith('<span>' + $(this).find('option:selected').text() + '</span>');
-      })
+      });
       $(document).on($.browser.msie ? 'click' : 'change', '.option-tree-ui-select', function(event) {
         $(this).prev('span').replaceWith('<span>' + $(this).find('option:selected').text() + '</span>');
       });
     },
+    init_google_fonts: function() {
+      var update_items = function(input, items, element) {
+        var itemsUI = input.closest('.type-google-font-group').find(element);
+        if ( itemsUI.length ) {
+          itemsUI.empty();
+          itemsUI.append($.map(items, function(item) {
+            var input = document.createElement('input'),
+                label = document.createElement('label');
+            input.type = 'checkbox';
+            input.id = ( itemsUI.data('field-id-prefix') || '' ) + item;
+            input.name =  ( itemsUI.data('field-name') || '' ) + '[]';
+            input.value =  item;
+            label.innerHTML = item;
+            $( label ).attr( 'for', input.id );
+            return $( document.createElement('p') ).addClass('checkbox-wrap').append([input, label]);
+          }));
+        }
+      };
+      $(document).on('change', '.option-tree-google-font-family select', function() {
+        var input = $(this);
+        $.ajax({
+          url: option_tree.ajax,
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            action: 'ot_google_font',
+            family: input.val(), 
+            field_id: input.attr('id')
+          }
+        }).done(function(response) {
+          if ( response.hasOwnProperty('variants') ) {
+            update_items( input, response.variants, '.option-tree-google-font-variants' );
+          }
+          if ( response.hasOwnProperty('subsets') ) {
+            update_items( input, response.subsets, '.option-tree-google-font-subsets' );
+          }
+        });
+      });
+      $('.js-add-google-font').on('click', function (event) {
+        var $group = $(this).parent('.format-setting-inner').find('.type-google-font-group'),
+            $clone = $('.type-google-font-group-clone').clone(true),
+            $count = $group.length ? $group.length : 0;
+        $clone.attr('class', 'type-google-font-group');
+        var replacer = function(index, elm) { 
+          return elm.replace('%key%', $count);
+        }
+        $('select', $clone).each( function() {
+          $(this).attr('id', replacer ).attr('name', replacer );
+        });
+        $('.option-tree-google-font-variants', $clone).each( function() {
+          $(this).attr('data-field-id-prefix', replacer ).attr('data-field-name', replacer );
+        });
+        $('.option-tree-google-font-subsets', $clone).each( function() {
+          $(this).attr('data-field-id-prefix', replacer ).attr('data-field-name', replacer );
+        });
+        $('.type-google-font-group-clone').before($clone)
+        event.preventDefault()
+      });
+      $('.js-remove-google-font').on('click', function (event) {
+        $(this).parents('.type-google-font-group').remove();
+        event.preventDefault();
+      });
+    },
     bind_colorpicker: function(field_id) {
-      $('#'+field_id).wpColorPicker();
+      $('#'+field_id).wpColorPicker({
+        change: function() {
+          OT_UI.parse_condition();
+        }, 
+        clear: function() {
+          OT_UI.parse_condition();
+        }
+      });
+    },
+    bind_date_picker: function(field_id, date_format) {
+      $('#'+field_id).datepicker({
+        showOtherMonths: true,
+        showButtonPanel: true,
+        currentText: option_tree.date_current,
+        closeText: option_tree.date_close,
+        dateFormat: date_format
+      });
+    },
+    bind_date_time_picker: function(field_id, date_format) {
+      $('#'+field_id).datetimepicker({
+        showOtherMonths: true,
+        closeText: option_tree.date_close,
+        dateFormat: date_format
+      });
     },
     fix_upload_parent: function() {
-      $(document).on('focus blur', '.option-tree-ui-upload-input', function(){
+      $('.option-tree-ui-upload-input').not('.ot-upload-attachment-id').on('focus blur', function(){
         $(this).parent('.option-tree-ui-upload-parent').toggleClass('focus');
         OT_UI.init_upload_fix(this);
       });
@@ -586,7 +721,46 @@
         event.preventDefault();
       });
     },
+    css_editor_mode: function() {
+      $('.ot-css-editor').each(function() {
+        var editor = ace.edit($(this).attr('id'));
+        var this_textarea = $('#textarea_' + $(this).attr('id'));
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/css");
+        editor.setShowPrintMargin( false );
+    
+        editor.getSession().setValue(this_textarea.val());
+        editor.getSession().on('change', function(){
+          this_textarea.val(editor.getSession().getValue());
+        });
+        this_textarea.on('change', function(){
+          editor.getSession().setValue(this_textarea.val());
+        });
+      });
+    },
+    javascript_editor_mode: function() {
+      $('.ot-javascript-editor').each(function() {
+        var editor = ace.edit($(this).attr('id'));
+        var this_textarea = $('#textarea_' + $(this).attr('id'));
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.setShowPrintMargin( false );
+    
+        editor.getSession().setValue(this_textarea.val());
+        editor.getSession().on('change', function(){
+          this_textarea.val(editor.getSession().getValue());
+        });
+        this_textarea.on('change', function(){
+          editor.getSession().setValue(this_textarea.val());
+        });
+      });
+    },
     url_exists: function(url) {
+      var link = document.createElement('a')
+      link.href = url
+      if ( link.hostname != window.location.hostname ) {
+        return true; // Stop the code from checking across domains.
+      }
       var http = new XMLHttpRequest();
       http.open('HEAD', url, false);
       http.send();
@@ -603,15 +777,12 @@
   });
 })(jQuery);
 
-/* Gallery*/
+/* Gallery */
 !function ($) {
   
   ot_gallery = {
       
     frame: function (elm) {
-
-      if ( this._frame )
-        return this._frame
       
       var selection = this.select(elm)
       
@@ -631,6 +802,7 @@
           , ids = library.pluck('id')
           , parent = $(elm).parents('.format-setting-inner')
           , input = parent.children('.ot-gallery-value')
+          , shortcode = wp.media.gallery.shortcode( selection ).string().replace(/\"/g,"'")
         
         input.attr('value', ids)
                         
@@ -642,15 +814,19 @@
           url: ajaxurl,
           dataType: 'html',
           data: {
-            action: 'gallery_update',
-            ids: ids
+            action: 'gallery_update'
+          , ids: ids
           },
           success: function(res) {
-            parent.children('.ot-gallery-list').html(res)
-            if ( $(elm).parent().children('.ot-gallery-delete').length <= 0 ) {
-              $(elm).parent().append('<a href="#" class="option-tree-ui-button red hug-left ot-gallery-delete">' + option_tree.delete + '</a>')
+            parent.children('.ot-gallery-list').html(res);
+            if ( input.hasClass('ot-gallery-shortcode') ) {
+              input.val(shortcode);
             }
-            $(elm).text(option_tree.edit)
+            if ( $(elm).parent().children('.ot-gallery-delete').length <= 0 ) {
+              $(elm).parent().append('<a href="#" class="option-tree-ui-button button button-secondary hug-left ot-gallery-delete">' + option_tree.delete + '</a>');
+            }
+            $(elm).text(option_tree.edit);
+            OT_UI.parse_condition();
           }
         })
       })
@@ -660,9 +836,10 @@
     }
       
   , select: function (elm) {
-      var ids = $(elm).parents('.format-setting-inner').children('.ot-gallery-value').attr('value')
-        , fakeShortcode = '[gallery ids="' + ids + '"]'
-        , shortcode = wp.shortcode.next('gallery', ( ids ? fakeShortcode : wp.media.view.settings.ot_gallery.shortcode ) )
+      var input = $(elm).parents('.format-setting-inner').children('.ot-gallery-value')
+        , ids = input.attr('value')
+        , _shortcode = input.hasClass('ot-gallery-shortcode') ? ids : '[gallery ids=\'' + ids + '\]'
+        , shortcode = wp.shortcode.next('gallery', ( ids ? _shortcode : wp.media.view.settings.ot_gallery.shortcode ) )
         , defaultPostId = wp.media.gallery.defaults.id
         , attachments
         , selection
@@ -676,6 +853,12 @@
       
       if ( _.isUndefined( shortcode.get('id') ) && ! _.isUndefined( defaultPostId ) )
         shortcode.set( 'id', defaultPostId )
+      
+      if ( _.isUndefined( shortcode.get('ids') ) && ! input.hasClass('ot-gallery-shortcode') && ids )
+        shortcode.set( 'ids', ids )
+      
+      if ( _.isUndefined( shortcode.get('ids') ) )
+        shortcode.set( 'ids', '0' )
       
       attachments = wp.media.gallery.attachments( shortcode )
 
@@ -706,11 +889,12 @@
   , remove: function (elm) {
       
       if ( confirm( option_tree.confirm ) ) {
-
-        $(elm).parents('.format-setting-inner').children('.ot-gallery-value').attr('value', ' ')
-        $(elm).parents('.format-setting-inner').children('.ot-gallery-list').remove()
-        $(elm).next('.ot-gallery-edit').text( option_tree.create )
-        $(elm).remove()
+        
+        $(elm).parents('.format-setting-inner').children('.ot-gallery-value').attr('value', '');
+        $(elm).parents('.format-setting-inner').children('.ot-gallery-list').remove();
+        $(elm).next('.ot-gallery-edit').text( option_tree.create );
+        $(elm).remove();
+        OT_UI.parse_condition();
         
       }
 
@@ -731,3 +915,489 @@
   })
   
 }(window.jQuery);
+
+/*!
+ * Adds metabox tabs
+ */
+!function ($) {
+
+  $(document).on('ready', function () {
+    
+    // Loop over the metaboxes
+    $('.ot-metabox-wrapper').each( function() {
+    
+      // Only if there is a tab option
+      if ( $(this).find('.type-tab').length ) {
+        
+        // Add .ot-metabox-panels
+        $(this).find('.type-tab').parents('.ot-metabox-wrapper').wrapInner('<div class="ot-metabox-panels" />')
+        
+        // Wrapp with .ot-metabox-tabs & add .ot-metabox-nav before .ot-metabox-panels
+        $(this).find('.ot-metabox-panels').wrap('<div class="ot-metabox-tabs" />').before('<ul class="ot-metabox-nav" />')
+        
+        // Loop over settings and build the tabs nav
+        $(this).find('.format-settings').each( function() {
+      
+          if ( $(this).find('.type-tab').length > 0 ) {
+            var title = $(this).find('.type-tab').prev().find('label').text()
+              , id = $(this).attr('id')
+  
+            // Add a class, hide & append nav item 
+            $(this).addClass('is-panel').hide()
+            $(this).parents('.ot-metabox-panels').prev('.ot-metabox-nav').append('<li><a href="#' + id + '">' + title + '</a></li>')
+            
+          }
+          
+        })
+        
+        // Loop over the panels and wrap and ID them.
+        $(this).find('.is-panel').each( function() {
+          var id = $(this).attr('id')
+          
+          $(this).add( $(this).nextUntil('.is-panel') ).wrapAll('<div id="' + id + '" class="tab-content" />')
+          
+        })
+        
+        // Create the tabs
+        $(this).find('.ot-metabox-tabs').tabs({
+          activate: function( event, ui ) {
+            var parent = $(this).outerHeight(),
+                child = $(this).find('.ot-metabox-panels').outerHeight() + 8,
+                minHeight = parent - 34
+            if ( $(this).find('.ot-metabox-panels').css('padding') == '12px' && child < parent ) {
+              $(this).find('.ot-metabox-panels').css({ minHeight: minHeight })
+            }
+            OT_UI.css_editor_mode();
+            OT_UI.javascript_editor_mode();
+          }
+        })
+        
+        // Move the orphaned settings to the top
+        $(this).find('.ot-metabox-panels > .format-settings').prependTo($(this))
+        
+        // Remove a bunch of classes to stop style conflicts.
+        $(this).find('.ot-metabox-tabs').removeClass('ui-widget ui-widget-content ui-corner-all')
+        $(this).find('.ot-metabox-nav').removeClass('ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all')
+        $(this).find('.ot-metabox-nav li').removeClass('ui-state-default ui-corner-top ui-tabs-active ui-tabs-active')
+        $(this).find('.ot-metabox-nav li').on('hover', function() { $(this).removeClass('ui-state-hover') })
+
+      }
+    
+    })
+     
+  })
+  
+}(window.jQuery);
+
+/*!
+ * Adds theme option tabs
+ */
+!function ($) {
+
+  $(document).on('ready', function () {
+    
+    // Loop over the theme options
+    $('#option-tree-settings-api .inside').each( function() {
+    
+      // Only if there is a tab option
+      if ( $(this).find('.type-tab').length ) {
+        
+        // Add .ot-theme-option-panels
+        $(this).find('.type-tab').parents('.inside').wrapInner('<div class="ot-theme-option-panels" />')
+        
+        // Wrap with .ot-theme-option-tabs & add .ot-theme-option-nav before .ot-theme-option-panels
+        $(this).find('.ot-theme-option-panels').wrap('<div class="ot-theme-option-tabs" />').before('<ul class="ot-theme-option-nav" />')
+        
+        // Loop over settings and build the tabs nav
+        $(this).find('.format-settings').each( function() {
+      
+          if ( $(this).find('.type-tab').length > 0 ) {
+            var title = $(this).find('.type-tab').prev().find('.label').text()
+              , id = $(this).attr('id')
+  
+            // Add a class, hide & append nav item 
+            $(this).addClass('is-panel').hide()
+            $(this).parents('.ot-theme-option-panels').prev('.ot-theme-option-nav').append('<li><a href="#' + id + '">' + title + '</a></li>')
+            
+          } else {
+          
+          }
+          
+        })
+        
+        // Loop over the panels and wrap and ID them.
+        $(this).find('.is-panel').each( function() {
+          var id = $(this).attr('id')
+          
+          $(this).add( $(this).nextUntil('.is-panel') ).wrapAll('<div id="' + id + '" class="tab-content" />')
+          
+        })
+        
+        // Create the tabs
+        $(this).find('.ot-theme-option-tabs').tabs()
+        
+        // Move the orphaned settings to the top
+        $(this).find('.ot-theme-option-panels > .format-settings').prependTo($(this).find('.ot-theme-option-tabs'))
+      
+      }
+    
+    })
+     
+  })
+  
+}(window.jQuery);
+
+/*!
+ * Fixes the state of metabox radio buttons after a Drag & Drop event.
+ */
+!function ($) {
+  
+  $(document).on('ready', function () {
+
+    // detect mousedown and store all checked radio buttons
+    $('.hndle').on('mousedown', function () {
+      
+      // get parent element of .hndle selected. 
+      // We only need to monitor radios insde the object that is being moved.
+      var parent_id = $(this).closest('div').attr('id')
+      
+      // set live event listener for mouse up on the content .wrap 
+      // then give the dragged div time to settle before firing the reclick function
+      $('.wrap').on('mouseup', function () {
+        
+        var ot_checked_radios = {}
+        
+        // loop over all checked radio buttons inside of parent element
+        $('#' + parent_id + ' input[type="radio"]').each( function () {
+          
+          // stores checked radio buttons
+          if ( $(this).is(':checked') ) {
+            
+            ot_checked_radios[$(this).attr('name')] = $(this).val()
+          
+          }
+          
+          // write to the object
+          $(document).data('ot_checked_radios', ot_checked_radios)
+          
+        })
+        
+        // restore all checked radio buttons 
+        setTimeout( function () {
+      
+          // get object of checked radio button names and values
+          var checked = $(document).data('ot_checked_radios')
+          
+          // step thru each object element and trigger a click on it's corresponding radio button
+          for ( key in checked ) {
+            
+            $('input[name="' + key + '"]').filter('[value="' + checked[key] + '"]').trigger('click')
+            
+          }
+          
+          $('.wrap').unbind('mouseup')
+          
+        }, 50 )
+      
+      })
+      
+    })
+  
+  })
+  
+}(window.jQuery);
+
+/*!
+ * postformats.js v1.0
+ */
+!function ($) {
+
+  "use strict"; // jshint ;_;
+
+  /* POSTFORMATS CLASS DEFINITION
+   * ====================== */
+  var formats = "input.post-format"
+    , metaboxes = [
+          '#ot-post-format-gallery'
+        , '#ot-post-format-link'
+        , '#ot-post-format-image'
+        , '#ot-post-format-quote'
+        , '#ot-post-format-video'
+        , '#ot-post-format-audio'
+      ]
+    , ids = metaboxes.join(',')
+    , insertAfter = '#titlediv'
+    , imageBox = '#postimagediv'
+    , placeholder = 'postimagediv-placeholder'
+    , Postformats = function (element, options) {
+        this.$element = $(element)
+          .on('click.postformats.data-api', $.proxy(this.toggle, this))
+        this.$id = this.$element.attr('id')
+        this.init()
+      }
+
+  Postformats.prototype = {
+
+    constructor: Postformats
+  
+  , init: function () {
+
+      // Moves the metaboxes into place
+      $( '#ot-' + this.$id ).insertAfter( $( insertAfter ) ).hide()
+      
+      // Show the checked metabox
+      if ( this.$element.is(':checked') ) {
+      
+        this.show()
+        
+      }
+      
+    }
+    
+  , toggle: function () {
+
+      // Hides all the post format metaboxes
+      $(ids).each(function() {
+      
+        $(this).hide()
+        
+      })
+      
+      // Shows the clicked post format metabox
+      this.show()
+      
+    }
+  
+  , show: function () {
+      
+      // Featured image is never really hidden so it requires different code 
+      if ( this.$id == 'post-format-image' ) {
+        
+        if ( $( '#' + placeholder ).length == 0 )
+          $( imageBox ).after( '<div id="' + placeholder + '"></div>' ).insertAfter( insertAfter ).find('h3 span').text(option_tree.with)
+        
+      // Revert image
+      } else {
+
+        $( '#' + placeholder ).replaceWith( $( imageBox ) )
+        $( imageBox ).find('h3 span').text(option_tree.replace)
+        
+      }
+      
+      // Show the metabox
+      $( '#ot-' + this.$id ).show()
+      
+    }
+  
+  }
+    
+  /* POSTFORMATS PLUGIN DEFINITION
+   * ======================= */
+  var old = $.fn.postformats
+
+  $.fn.postformats = function (option) {
+    return this.each(function () {
+      var $this = $(this)
+        , data = $this.data('postformats')
+        , options = typeof option == 'object' && option
+      if (!data) $this.data('postformats', (data = new Postformats(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  $.fn.postformats.Constructor = Postformats
+  
+  /* POSTFORMATS NO CONFLICT
+   * ================= */
+  $.fn.postformats.noConflict = function () {
+    $.fn.postformats = old
+    return this
+  }
+
+  /* POSTFORMATS DATA-API
+   * ============== */
+  $(document).on('ready.postformats.data-api', function () {
+    $(formats).each(function () {
+      $(this).postformats()
+    })
+  })
+
+}(window.jQuery);
+
+/*!
+ * Adds opacity to the default colorpicker
+ *
+ * Derivative work of the Codestar WP Color Picker.
+ */
+;(function ( $, window, document, undefined ) {
+  'use strict';
+
+  // adding alpha support for Automattic Color.js toString function.
+  if( typeof Color.fn.toString !== undefined ) {
+
+    Color.fn.toString = function () {
+
+      // check for alpha
+      if ( this._alpha < 1 ) {
+        return this.toCSS('rgba', this._alpha).replace(/\s+/g, '');
+      }
+
+      var hex = parseInt( this._color, 10 ).toString( 16 );
+
+      if ( this.error ) { return ''; }
+
+      // maybe left pad it
+      if ( hex.length < 6 ) {
+        for (var i = 6 - hex.length - 1; i >= 0; i--) {
+          hex = '0' + hex;
+        }
+      }
+
+      return '#' + hex;
+
+    };
+
+  }
+
+  $.ot_ParseColorValue = function( val ) {
+
+    var value = val.replace(/\s+/g, ''),
+        alpha = ( value.indexOf('rgba') !== -1 ) ? parseFloat( value.replace(/^.*,(.+)\)/, '$1') * 100 ) : 100,
+        rgba  = ( alpha < 100 ) ? true : false;
+
+    return { value: value, alpha: alpha, rgba: rgba };
+
+  };
+
+  $.fn.ot_wpColorPicker = function() {
+
+    return this.each(function() {
+
+      var $this = $(this);
+
+      // check for rgba enabled/disable
+      if( $this.data('rgba') !== false ) {
+
+        // parse value
+        var picker = $.ot_ParseColorValue( $this.val() );
+
+        // wpColorPicker core
+        $this.wpColorPicker({
+
+          // wpColorPicker: change
+          change: function( event, ui ) {
+
+            // update checkerboard background color
+            $this.closest('.wp-picker-container').find('.option-tree-opacity-slider-offset').css('background-color', ui.color.toString());
+            $this.trigger('keyup');
+
+          },
+
+          // wpColorPicker: create
+          create: function( event, ui ) {
+
+            // set variables for alpha slider
+            var a8cIris       = $this.data('a8cIris'),
+                $container    = $this.closest('.wp-picker-container'),
+
+                // appending alpha wrapper
+                $alpha_wrap   = $('<div class="option-tree-opacity-wrap">' +
+                                  '<div class="option-tree-opacity-slider"></div>' +
+                                  '<div class="option-tree-opacity-slider-offset"></div>' +
+                                  '<div class="option-tree-opacity-text"></div>' +
+                                  '</div>').appendTo( $container.find('.wp-picker-holder') ),
+
+                $alpha_slider = $alpha_wrap.find('.option-tree-opacity-slider'),
+                $alpha_text   = $alpha_wrap.find('.option-tree-opacity-text'),
+                $alpha_offset = $alpha_wrap.find('.option-tree-opacity-slider-offset');
+
+            // alpha slider
+            $alpha_slider.slider({
+
+              // slider: slide
+              slide: function( event, ui ) {
+
+                var slide_value = parseFloat( ui.value / 100 );
+
+                // update iris data alpha && wpColorPicker color option && alpha text
+                a8cIris._color._alpha = slide_value;
+                $this.wpColorPicker( 'color', a8cIris._color.toString() );
+                $alpha_text.text( ( slide_value < 1 ? slide_value : '' ) );
+
+              },
+
+              // slider: create
+              create: function() {
+
+                var slide_value = parseFloat( picker.alpha / 100 ),
+                    alpha_text_value = slide_value < 1 ? slide_value : '';
+
+                // update alpha text && checkerboard background color
+                $alpha_text.text(alpha_text_value);
+                $alpha_offset.css('background-color', picker.value);
+
+                // wpColorPicker clear button for update iris data alpha && alpha text && slider color option
+                $container.on('click', '.wp-picker-clear', function() {
+
+                  a8cIris._color._alpha = 1;
+                  $alpha_text.text('');
+                  $alpha_slider.slider('option', 'value', 100).trigger('slide');
+
+                });
+
+                // wpColorPicker default button for update iris data alpha && alpha text && slider color option
+                $container.on('click', '.wp-picker-default', function() {
+
+                  var default_picker = $.ot_ParseColorValue( $this.data('default-color') ),
+                      default_value  = parseFloat( default_picker.alpha / 100 ),
+                      default_text   = default_value < 1 ? default_value : '';
+
+                  a8cIris._color._alpha = default_value;
+                  $alpha_text.text(default_text);
+                  $alpha_slider.slider('option', 'value', default_picker.alpha).trigger('slide');
+
+                });
+
+                // show alpha wrapper on click color picker button
+                $container.on('click', '.wp-color-result', function() {
+                  $alpha_wrap.toggle();
+                });
+
+                // hide alpha wrapper on click body
+                $('body').on( 'click.wpcolorpicker', function() {
+                  $alpha_wrap.hide();
+                });
+
+              },
+
+              // slider: options
+              value: picker.alpha,
+              step: 1,
+              min: 1,
+              max: 100
+
+            });
+          }
+
+        });
+
+      } else {
+
+        // wpColorPicker default picker
+        $this.wpColorPicker({
+          change: function() {
+            $this.trigger('keyup');
+          }
+        });
+
+      }
+
+    });
+
+  };
+
+  $(document).ready( function(){
+    $('.hide-color-picker.ot-colorpicker-opacity').ot_wpColorPicker();
+  });
+
+})( jQuery, window, document );

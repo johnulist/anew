@@ -4,11 +4,9 @@
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<title><?php wp_title(''); ?></title>
-
-	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
+	
 	<?php wp_head(); ?>
 </head>
 
@@ -40,7 +38,7 @@
 			<?php if ( ot_get_option('header-image') == '' ): ?>
 			<div class="pad group">
 				<?php echo alx_site_title(); ?>
-				<?php if ( !ot_get_option('site-description') ): ?><p class="site-description"><?php bloginfo( 'description' ); ?></p><?php endif; ?>
+				<?php if ( ot_get_option('site-description') != 'off' ): ?><p class="site-description"><?php bloginfo( 'description' ); ?></p><?php endif; ?>
 				<?php alx_social_links() ; ?>
 			</div>
 			<?php endif; ?>

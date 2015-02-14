@@ -7,7 +7,61 @@
  * @copyright Copyright (c) 2013, Derek Herman
  * @since     2.0
  */
-      
+
+/**
+ * Theme Options ID
+ *
+ * @return    string
+ *
+ * @access    public
+ * @since     2.3.0
+ */
+if ( ! function_exists( 'ot_options_id' ) ) {
+
+  function ot_options_id() {
+    
+    return apply_filters( 'ot_options_id', 'option_tree' );
+    
+  }
+  
+}
+
+/**
+ * Theme Settings ID
+ *
+ * @return    string
+ *
+ * @access    public
+ * @since     2.3.0
+ */
+if ( ! function_exists( 'ot_settings_id' ) ) {
+
+  function ot_settings_id() {
+    
+    return apply_filters( 'ot_settings_id', 'option_tree_settings' );
+    
+  }
+  
+}
+
+/**
+ * Theme Layouts ID
+ *
+ * @return    string
+ *
+ * @access    public
+ * @since     2.3.0
+ */
+if ( ! function_exists( 'ot_layouts_id' ) ) {
+
+  function ot_layouts_id() {
+    
+    return apply_filters( 'ot_layouts_id', 'option_tree_layouts' );
+    
+  }
+  
+}
+
 /**
  * Get Option.
  *
@@ -26,7 +80,7 @@ if ( ! function_exists( 'ot_get_option' ) ) {
   function ot_get_option( $option_id, $default = '' ) {
     
     /* get the saved options */ 
-    $options = get_option( 'option_tree' );
+    $options = get_option( ot_options_id() );
     
     /* look for the saved value */
     if ( isset( $options[$option_id] ) && '' != $options[$option_id] ) {
@@ -42,7 +96,7 @@ if ( ! function_exists( 'ot_get_option' ) ) {
 }
 
 /**
- * Echo Option. (via Github @joshlevinson)
+ * Echo Option.
  *
  * Helper function to echo the option value.
  * If no value has been saved, it echos $default.
@@ -81,7 +135,7 @@ if ( ! function_exists( 'ot_wpml_filter' ) ) {
     // Return translated strings using WMPL
     if ( function_exists('icl_t') ) {
       
-      $settings = get_option( 'option_tree_settings' );
+      $settings = get_option( ot_settings_id() );
       
       if ( isset( $settings['settings'] ) ) {
       
@@ -89,6 +143,26 @@ if ( ! function_exists( 'ot_wpml_filter' ) ) {
           
           // List Item & Slider
           if ( $option_id == $setting['id'] && in_array( $setting['type'], array( 'list-item', 'slider' ) ) ) {
+          
+            foreach( $options[$option_id] as $key => $value ) {
+          
+              foreach( $value as $ckey => $cvalue ) {
+                
+                $id = $option_id . '_' . $ckey . '_' . $key;
+                $_string = icl_t( 'Theme Options', $id, $cvalue );
+                
+                if ( ! empty( $_string ) ) {
+                
+                  $options[$option_id][$key][$ckey] = $_string;
+                  
+                }
+                
+              }
+            
+            }
+          
+          // List Item & Slider
+          } else if ( $option_id == $setting['id'] && $setting['type'] == 'social-links' ) {
           
             foreach( $options[$option_id] as $key => $value ) {
           
@@ -147,10 +221,13 @@ if ( ! function_exists( 'ot_load_dynamic_css' ) ) {
     /* don't load in the admin */
     if ( is_admin() )
       return;
-    
+
     /* grab a copy of the paths */
     $ot_css_file_paths = get_option( 'ot_css_file_paths', array() );
-    
+    if ( is_multisite() ) {
+      $ot_css_file_paths = get_blog_option( get_current_blog_id(), 'ot_css_file_paths', $ot_css_file_paths );
+    }
+
     if ( ! empty( $ot_css_file_paths ) ) {
       
       $last_css = '';
@@ -188,9 +265,83 @@ if ( ! function_exists( 'ot_load_dynamic_css' ) ) {
 }
 
 /**
- * Registers the Theme Option page link for the admin bar.
+ * Enqueue the Google Fonts CSS.
  *
- * @uses      ot_register_settings()
+ * @return    void
+ *
+ * @access    public
+ * @since     2.5.0
+ */
+if ( ! function_exists( 'ot_load_google_fonts_css' ) ) {
+
+  function ot_load_google_fonts_css() {
+
+    /* don't load in the admin */
+    if ( is_admin() )
+      return;
+
+    $ot_google_fonts      = get_theme_mod( 'ot_google_fonts', array() );
+    $ot_set_google_fonts  = get_theme_mod( 'ot_set_google_fonts', array() );
+    $families             = array();
+    $subsets              = array();
+    $append               = '';
+
+    if ( ! empty( $ot_set_google_fonts ) ) {
+
+      foreach( $ot_set_google_fonts as $id => $fonts ) {
+
+        foreach( $fonts as $font ) {
+
+          // Can't find the font, bail!
+          if ( ! isset( $ot_google_fonts[$font['family']]['family'] ) ) {
+            continue;
+          }
+
+          // Set variants & subsets
+          if ( ! empty( $font['variants'] ) && is_array( $font['variants'] ) ) {
+
+            // Variants string
+            $variants = ':' . implode( ',', $font['variants'] );
+
+            // Add subsets to array
+            if ( ! empty( $font['subsets'] ) && is_array( $font['subsets'] ) ) {
+              foreach( $font['subsets'] as $subset ) {
+                $subsets[] = $subset;
+              }
+            }
+
+          }
+
+          // Add family & variants to array
+          if ( isset( $variants ) ) {
+            $families[] = str_replace( ' ', '+', $ot_google_fonts[$font['family']]['family'] ) . $variants;
+          }
+
+        }
+
+      }
+
+    }
+
+    if ( ! empty( $families ) ) {
+
+      // Append all subsets to the path, unless the only subset is latin.
+      if ( ! empty( $subsets ) ) {
+        $subsets = implode( ',', array_unique( $subsets ) );
+        if ( $subsets != 'latin' ) {
+          $append = '&subset=' . $subsets;
+        }
+      }
+
+      wp_enqueue_style( 'ot-google-fonts', esc_url( '//fonts.googleapis.com/css?family=' . implode( '|', $families ) ) . $append, false, null );
+    }
+
+  }
+
+}
+
+/**
+ * Registers the Theme Option page link for the admin bar.
  *
  * @return    void
  *

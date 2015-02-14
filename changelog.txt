@@ -1,6 +1,84 @@
   Theme : Anew
-Version : 2.0.8
+Version : 2.2.2
  Author : Alexander "Alx" Agnarson - http://alxmedia.se
+
+February 6 2015 - 2.2.2
+===========================================================
+- Fixed dropdown menus for iPhone
+- Fixed toggle sidebars for iPhone and iPad
+- Fixed typos in functions.php - @jaylinski (via GitHub)
+- Added missing wp_reset_postdata to tabs and posts widgets - @Marco Almeida
+- Optimized search results - @Marco Almeida
+- Updated language files
+- Updated to jPlayer 2.9.2
+
+January 29 2015 - 2.2.1
+===========================================================
+- Fixed double title tags
+
+December 31 2014 - 2.2.0
+===========================================================
+- Added WP 4.1 title tag support
+- Updated to OptionTree 2.4.6
+
+October 10 2014 - 2.1.9
+===========================================================
+- Updated documentation
+- Fixed gallery format post slider, downgraded to flexslider 2.1 instead of 2.2
+- Re-fixed responsive Jetpack embeds
+
+September 18 2014 - 2.1.8
+===========================================================
+- Added option to turn recommended plugins off
+- Fixed protocol-relative URLs for Google Fonts - @chkorn (via GitHub)
+- Fixed Twitter embeds - @ShinichiNishikawa (via GitHub)
+- Fixed capability with WP-UserAgent - @JayXon (via GitHub)
+
+September 3 2014 - 2.1.7
+===========================================================
+- Updated to Font Awesome 4.2.0
+
+August 20 2014 - 2.1.6
+===========================================================
+- Updated to OptionTree 2.4.2
+
+May 17 2014 - 2.1.5
+===========================================================
+- Updated to OptionTree 2.4.0
+- Updated to Font Awesome 4.1.0
+- Improved alx_wp_title function - @Gummibeer (via GitHub)
+
+April 16 2014 - 2.1.4
+===========================================================
+- Fixed IE8 blank page issue, downgraded to stable selectivizr.js 1.0.2 instead of 1.0.3b
+
+Mars 31 2014 - 2.1.3
+===========================================================
+- WP-PageNavi optimizations - @devinsays (via GitHub)
+- Fixed admin comment accent color styling option
+- Restructured comment/pingback counts for no plural translation
+
+Mars 24 2014 - 2.1.2
+===========================================================
+- Updated to OptionTree 2.3.4
+
+February 10 2014 - 2.1.1
+===========================================================
+- Updated to OptionTree 2.3.0
+- Changed checkbox options to the new on-off toggle
+- Added additional Google fonts
+- Updated help dropdown information and included theme documentation with the theme
+
+January 29 2014 - 2.1.0
+===========================================================
+- Updated to OptionTree 2.2.2
+- Fixed background-size styling option
+- Fixed comment counts to be hidden when disabled
+- Removed inline css from comments template
+
+January 23 2014 - 2.0.9
+===========================================================
+- Updated to OptionTree 2.2.1
 
 December 28 2013 - 2.0.8
 ===========================================================

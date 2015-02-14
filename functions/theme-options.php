@@ -24,28 +24,15 @@ function custom_theme_options() {
           'title'     => 'Documentation',
           'content'   => '
 			<h1>Anew</h1>
-			<p>Thanks for using this theme! First, a friendly warning: Please remember that the "Reset Options" button resets <strong>ALL</strong> options. That means, if you reset your styling options, all your custom sidebars and other settings will be reset as well.</p>
-			<h3>Frequently Asked Questions</h3>
-			<p><i>Q: Why are social sharing buttons missing Google Plus?</i> &mdash; A: You need to enable urlCurl on your server for G+ to work. Ask your webhost to do so. If you are unable to, you can disable the buttons and use any other plugin instead.</p>
-			<p><i>Q: My old thumbnails have different sizes, why?</i> &mdash; A: Thumbnails uploaded before changing theme will not be automatically re-cropped. To fix this, you need to run the <a target="_blank" href="http://wordpress.org/plugins/regenerate-thumbnails/">Regenerate Thumbnails</a> plugin once.</p>
-			<p><i>Q: I did not use featured images before and have many posts, what do I do?</i> &mdash; A: Use the <a target="_blank" href="http://wordpress.org/plugins/easy-add-thumbnail/">Easy Add Thumbnail</a> plugin to automatically make the first image uploaded to each post a featured image.</p>
-			<p><i>Q: Why is my featured image not appearing on the single post page?</i> &mdash; A: You need to use the "Image" format option for it to show up, as not everyone wants to show the featured image at the top for the "Standard" post format.</p>
-			<p><i>Q: My gallery format post shows images twice, why?</i> &mdash; A: This is because you insert a standard gallery into the post itself. This is not needed, as the gallery format post will auto-display attached images in the slider above.</p>
-			<p><i>Q: My slider gallery includes images I only want to show in the content below</i> &mdash; A: The gallery format will always show all attached images. For it to not show up, go to Media > Add New and upload it there. Then go back to the post and add it.</p>
-			<h3>Dynamic Styles</h3>
-			<p>The dynamic styles will be added directly to the head of your theme. This is according to WordPress best practices, but if you do not want it printed out there, simply inspect the code of your page with the styling options set. Copy the CSS from head into your child theme\'s style.css file or this theme\'s custom.css (which you need to enable), and disable dynamic styling.</p>
-			<h3>Theme Customization</h3>
-			<p>When modifiying the theme you should always use a child theme, otherwise your customized files will be removed/overwritten when you update the theme. Download the sample child theme below and upload it via admin. Then activate your child theme and start customizing it!</p>
+			<p>Thanks for using this theme! Enjoy.</p>
 			<ul>
-				<li>Read more how to use a child theme <a target="_blank" href="http://codex.wordpress.org/Child_Themes">here</a>.</li>
-				<li>Download the Anew sample child theme <a href="https://github.com/AlxMedia/anew-child/archive/master.zip">here</a>.</li>
+				<li>Read the theme documentation <a target="_blank" href="'.get_template_directory_uri().'/functions/documentation/documentation.html">here</a></li>
+				<li>Download the sample child theme <a href="https://github.com/AlxMedia/anew-child/archive/master.zip">here</a></li>
+				<li>Download or contribute translations <a target="_blank" href="https://github.com/AlxMedia/anew-languages">here</a></li>
+				<li>Anew is on <a target="_blank" href="https://github.com/AlxMedia/anew">GitHub</a></li>
 			</ul>
-			<p>If you are <strong>not using a child theme</strong>, you must do this before each theme update:</p>
-			<ol>
-				<li>Backup your custom.css file if you have used it, it will be overwritten and needs to be re-added after the update.</li>
-				<li>Backup your additional language files if you have created/modified any, they will be removed and need to be re-added after the update.</li>
-				<li>Backup any other custom code.</li>
-			</ol>
+			<hr />
+			<p>You can support the theme author by donating <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C5J7JHMSHW9T8">here</a> – any amount is always appreciated.</p>
 		'
         )
       )
@@ -96,43 +83,28 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'custom',
 			'label'		=> 'Custom Stylesheet',
-			'desc'		=> 'Load your custom styles [ <strong>custom.css</strong> ]<br /><i>Note: You must backup this file before a theme update. Consider using a <a target="_blank" href="http://codex.wordpress.org/Child_Themes">child theme</a> instead. A sample child theme is available in the help dropdown.</i>',
-			'type'		=> 'checkbox',
-			'section'	=> 'general',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Enable'
-				)
-			)
+			'desc'		=> 'Load custom stylesheet [ <strong>custom.css</strong> ]<br /><i>Note: You must backup this file before a theme update. Consider using a <a target="_blank" href="http://codex.wordpress.org/Child_Themes">child theme</a> instead. A sample child theme is available in the help dropdown.</i>',
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'general'
 		),
 		// General: Responsive Layout
 		array(
 			'id'		=> 'responsive',
 			'label'		=> 'Responsive Layout',
-			'desc'		=> 'Disable mobile and tablet optimizations [ <strong>responsive.css</strong> ]',
-			'type'		=> 'checkbox',
-			'section'	=> 'general',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				)
-			)
+			'desc'		=> 'Mobile and tablet optimizations [ <strong>responsive.css</strong> ]',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'general'
 		),
 		// General: Mobile Sidebar
 		array(
 			'id'		=> 'mobile-sidebar-hide',
 			'label'		=> 'Mobile Sidebar Content',
-			'desc'		=> 'Hide sidebar content on low-resolution mobile devices (320px)',
-			'type'		=> 'checkbox',
-			'section'	=> 'general',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Hide'
-				)
-			)
+			'desc'		=> 'Sidebar content on low-resolution mobile devices (320px)',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'general'
 		),
 		// General: Favicon
 		array(
@@ -162,22 +134,25 @@ function custom_theme_options() {
 		// General: Comments
 		array(
 			'id'		=> 'page-comments',
-			'label'		=> 'Comments',
-			'desc'		=> '',
-			'type'		=> 'checkbox',
-			'section'	=> 'general',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Enable comments on pages',
-					'std'	=> '1'
-				)
-			)
+			'label'		=> 'Page Comments',
+			'desc'		=> 'Comments on pages',
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'general'
+		),
+		// General: Recommended Plugins
+		array(
+			'id'		=> 'recommended-plugins',
+			'label'		=> 'Recommended Plugins',
+			'desc'		=> 'Enable or disable the recommended plugins notice',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'general'
 		),
 		// Blog: Single - Content or Excerpt
 		array(
 			'id'		=> 'post-text',
-			'label'		=> 'Content or Excerpt',
+			'label'		=> 'Entry Text',
 			'desc'		=> 'More link appears at the bottom of both excerpt and content',
 			'std'		=> 'excerpt',
 			'type'		=> 'radio',
@@ -206,16 +181,11 @@ function custom_theme_options() {
 		// Blog: Single - Sharrre
 		array(
 			'id'		=> 'sharrre',
-			'label'		=> 'Single &mdash; Share Buttons',
+			'label'		=> 'Single &mdash; Share Bar',
 			'desc'		=> 'Social sharing buttons for each article',
-			'type'		=> 'checkbox',
-			'section'	=> 'blog',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				)
-			)
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'blog'
 		),
 		// Blog: Twitter Username
 		array(
@@ -230,33 +200,18 @@ function custom_theme_options() {
 			'id'		=> 'author-bio',
 			'label'		=> 'Single &mdash; Author Bio',
 			'desc'		=> 'Shows post author description, if it exists',
-			'type'		=> 'checkbox',
-			'section'	=> 'blog',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				)
-			)
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'blog'
 		),
 		// Blog: Single - Post Navigation
 		array(
 			'id'		=> 'post-nav',
 			'label'		=> 'Single &mdash; Post Navigation',
 			'desc'		=> 'Shows links to the next and previous article',
-			'std'		=> 'content',
-			'type'		=> 'radio',
-			'section'	=> 'blog',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				),
-				array( 
-					'value' => 'content',
-					'label' => 'Below content'
-				)
-			)
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'blog'
 		),
 		// Header: Custom Logo
 		array(
@@ -271,14 +226,9 @@ function custom_theme_options() {
 			'id'		=> 'site-description',
 			'label'		=> 'Site Description',
 			'desc'		=> 'The description that appears next to your logo',
-			'type'		=> 'checkbox',
-			'section'	=> 'header',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				)
-			)
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'header'
 		),
 		// Header: Header Image
 		array(
@@ -345,16 +295,10 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'credit',
 			'label'		=> 'Footer Credit',
-			'desc'		=> 'Disable footer credit text',
-			'std'		=> '',
-			'type'		=> 'checkbox',
-			'section'	=> 'footer',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Disable'
-				)
-			)
+			'desc'		=> 'Footer credit text',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'footer'
 		),
 		// Layout : Global
 		array(
@@ -720,29 +664,19 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'dynamic-styles',
 			'label'		=> 'Dynamic Styles',
-			'desc'		=> 'Turn styling options on / off',
-			'type'		=> 'checkbox',
-			'section'	=> 'styling',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Enable to use the options below'
-				)
-			)
+			'desc'		=> 'Turn on to use the styling options below',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'styling'
 		),
-		// General: Boxed Layout
+		// Styling: Boxed Layout
 		array(
 			'id'		=> 'boxed',
 			'label'		=> 'Boxed Layout',
 			'desc'		=> 'Use a boxed layout',
-			'type'		=> 'checkbox',
-			'section'	=> 'styling',
-			'choices'	=> array(
-				array( 
-					'value' => '1',
-					'label' => 'Enable'
-				)
-			)
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'styling'
 		),
 		// Styling: Font
 		array(
@@ -774,6 +708,10 @@ function custom_theme_options() {
 					'label' => 'Ubuntu, Latin-Ext (Google Fonts)'
 				),
 				array( 
+					'value' => 'ubuntu-cyr',
+					'label' => 'Ubuntu, Latin / Cyrillic-Ext (Google Fonts)'
+				),
+				array( 
 					'value' => 'roboto-condensed',
 					'label' => 'Roboto Condensed, Latin-Ext (Google Fonts)'
 				),
@@ -788,6 +726,14 @@ function custom_theme_options() {
 				array( 
 					'value' => 'open-sans-cyr',
 					'label' => 'Open Sans, Latin / Cyrillic-Ext (Google Fonts)'
+				),
+				array( 
+					'value' => 'pt-serif',
+					'label' => 'PT Serif, Latin-Ext (Google Fonts)'
+				),
+				array( 
+					'value' => 'pt-serif-cyr',
+					'label' => 'PT Serif, Latin / Cyrillic-Ext (Google Fonts)'
 				),
 				array( 
 					'value' => 'arial',
@@ -813,7 +759,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-accent',
 			'label'		=> 'Primary Accent Color',
-			'desc'		=> '<i>Default: #e8554e</i>',
 			'std'		=> '#e8554e',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -822,7 +767,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-topbar',
 			'label'		=> 'Topbar Background',
-			'desc'		=> '<i>Default: #222222</i>',
 			'std'		=> '#222222',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -831,7 +775,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-header',
 			'label'		=> 'Header Background',
-			'desc'		=> '<i>Default: #f2f2f2</i>',
 			'std'		=> '#f2f2f2',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -855,7 +798,6 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-footer',
 			'label'		=> 'Footer Background',
-			'desc'		=> '<i>Default: #222222</i>',
 			'std'		=> '#222222',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -864,7 +806,7 @@ function custom_theme_options() {
 		array(
 			'id'		=> 'color-footer-toplink',
 			'label'		=> 'Footer Toplink Color',
-			'desc'		=> 'Suggestion - use the same color as your primary accent color<br /><i>Default: #333333</i>',
+			'desc'		=> 'Suggestion - use the same color as your primary accent color',
 			'std'		=> '#333333',
 			'type'		=> 'colorpicker',
 			'section'	=> 'styling'
@@ -883,7 +825,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-audio',
 				'label'		=> 'Format: Audio',
-				'desc'		=> '<i>Default: #69bac8</i>',
 				'std'		=> '#69bac8',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -891,7 +832,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-chat',
 				'label'		=> 'Format: Chat',
-				'desc'		=> '<i>Default: #69bac8</i>',
 				'std'		=> '#69bac8',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -899,7 +839,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-gallery',
 				'label'		=> 'Format: Gallery',
-				'desc'		=> '<i>Default: #7eb66f</i>',
 				'std'		=> '#7eb66f',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -907,7 +846,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-image',
 				'label'		=> 'Format: Image',
-				'desc'		=> '<i>Default: #7eb66f</i>',
 				'std'		=> '#7eb66f',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -915,7 +853,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-link',
 				'label'		=> 'Format: Link',
-				'desc'		=> '<i>Default: #e8554e</i>',
 				'std'		=> '#e8554e',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -923,7 +860,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-quote',
 				'label'		=> 'Format: Quote',
-				'desc'		=> '<i>Default: #e7ba3a</i>',
 				'std'		=> '#e7ba3a',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -931,7 +867,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-status',
 				'label'		=> 'Format: Status',
-				'desc'		=> '<i>Default: #ffa500</i>',
 				'std'		=> '#ffa500',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'
@@ -939,7 +874,6 @@ function custom_theme_options() {
 			array(
 				'id'		=> 'color-video',
 				'label'		=> 'Format: Video',
-				'desc'		=> '<i>Default: #e8554e</i>',
 				'std'		=> '#e8554e',
 				'type'		=> 'colorpicker',
 				'section'	=> 'styling'

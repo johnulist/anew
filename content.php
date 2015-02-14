@@ -9,7 +9,7 @@
 	<ul class="post-meta pad group">
 		<li><?php the_category(' / '); ?></li>
 		<li><i class="fa fa-clock-o"></i><?php the_time('j M, Y'); ?></li>
-		<li><a href="<?php comments_link(); ?>"><i class="fa fa-comment"></i><?php comments_number( '0', '1', '%' ); ?></a></li>
+		<?php if ( comments_open() ): ?><li><a href="<?php comments_link(); ?>"><i class="fa fa-comment"></i><?php comments_number( '0', '1', '%' ); ?></a></li><?php endif; ?>
 	</ul><!--/.post-meta-->
 	
 	<div class="post-inner">
